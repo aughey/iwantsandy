@@ -18,7 +18,7 @@ loop do
     # make a connection to imap account
     puts "Connecting to imap #{config['host']}"
     imap = Net::IMAP.new(config['host'], config['port'], true)
-    puts "Logging in with #{config['username']} #{config['password']}"
+    puts "Logging in with #{config['username']}"
     imap.login(config['username'], config['password'])
     # select inbox as our mailbox to process
     puts "Selecting inbox"
@@ -29,50 +29,20 @@ loop do
     imap.uid_search(["NOT", "DELETED"]).each do |uid|
       puts "Found an e-mail"
 
-      # fetches the straight up source of the email for tmail to parse
+      # fetches the straight up source of the email
       source   = imap.uid_fetch(uid, ['RFC822']).first.attr['RFC822']
-      envelope = imap.uid_fetch(uid, ["ENVELOPE"])
 
-#      puts "Source:"
-#      puts source.inspect
+      email = RawEmail.create(:rfc822 => source)
 
-#      puts "Envelope"
-#      puts envelope.inspect
       message = TMail::Mail.parse(source)
-      puts "To: #{message.to}"
+      puts "To: #{email.to}"
       puts "Body:"
-      puts message.body
+      puts email.body
 
-      if false
-        # Location#new_from_email accepts the source and creates new location
-        location = Location.new_from_email(source)
-
-        # check for an existing location that matches the one created from email source
-        existing = Location.existing_address(location)
-
-        if existing
-          # location exists so update the sign color to the emailed location
-          existing.signs = location.signs
-          if existing.save
-            # existing location was updated
-          else
-            # existing location was invalid
-          end
-        elsif location.save
-          # emailed location was valid and created
-        else
-          # emailed location was invalid
-        end
-      end
-
-      if false
-        # there isn't move in imap so we copy to new mailbox and then delete from inbox
-        imap.uid_copy(uid, "[Gmail]/All Mail")
-        imap.uid_store(uid, "+FLAGS", [:Deleted])
-      end
+      imap.uid_copy(uid, "[Gmail]/All Mail")
+      imap.uid_store(uid, "+FLAGS", [:Deleted])
     end
 
-    # expunge removes the deleted emails
     puts "Expunging emails"
     imap.expunge
     imap.logout
