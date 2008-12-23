@@ -61,6 +61,8 @@ loop do
     # send to log file, db, or email
   end
 
+  puts "Done fetching mail.  Wsiting #{SLEEP_TIME} seconds"
+
   # sleep for SLEEP_TIME and then do it all over again
   sleep(SLEEP_TIME)
 end
