@@ -4,6 +4,7 @@ ENV['RAILS_ENV'] ||= 'development'
 require File.join(File.dirname(__FILE__), '..', 'config', 'environment')
 require 'net/imap'
 require 'net/http'
+require 'tmail'
 
 # amount of time to sleep after each loop below
 SLEEP_TIME = 60
@@ -23,47 +24,70 @@ loop do
     puts "Selecting inbox"
     imap.select('Inbox')
 
+    puts "Searching for not deleted e-mails"
     # get all emails that are in inbox that have not been deleted
     imap.uid_search(["NOT", "DELETED"]).each do |uid|
+      puts "Found an e-mail"
+
       # fetches the straight up source of the email for tmail to parse
       source   = imap.uid_fetch(uid, ['RFC822']).first.attr['RFC822']
+      envelope = imap.uid_fetch(uid, ["ENVELOPE"])
 
-      # Location#new_from_email accepts the source and creates new location
-      location = Location.new_from_email(source)
+#      puts "Source:"
+#      puts source.inspect
 
-      # check for an existing location that matches the one created from email source
-      existing = Location.existing_address(location)
+#      puts "Envelope"
+#      puts envelope.inspect
+      message = TMail::Mail.parse(source)
+      puts "To: #{message.to}"
+      puts "Body:"
+      puts message.body
 
-      if existing
-        # location exists so update the sign color to the emailed location
-        existing.signs = location.signs
-        if existing.save
-          # existing location was updated
+      if false
+        # Location#new_from_email accepts the source and creates new location
+        location = Location.new_from_email(source)
+
+        # check for an existing location that matches the one created from email source
+        existing = Location.existing_address(location)
+
+        if existing
+          # location exists so update the sign color to the emailed location
+          existing.signs = location.signs
+          if existing.save
+            # existing location was updated
+          else
+            # existing location was invalid
+          end
+        elsif location.save
+          # emailed location was valid and created
         else
-          # existing location was invalid
+          # emailed location was invalid
         end
-      elsif location.save
-        # emailed location was valid and created
-      else
-        # emailed location was invalid
       end
 
-      # there isn't move in imap so we copy to new mailbox and then delete from inbox
-      imap.uid_copy(uid, "[Gmail]/All Mail")
-      imap.uid_store(uid, "+FLAGS", [:Deleted])
+      if false
+        # there isn't move in imap so we copy to new mailbox and then delete from inbox
+        imap.uid_copy(uid, "[Gmail]/All Mail")
+        imap.uid_store(uid, "+FLAGS", [:Deleted])
+      end
     end
 
     # expunge removes the deleted emails
+    puts "Expunging emails"
     imap.expunge
     imap.logout
     imap.disconnect
 
-  # NoResponseError and ByResponseError happen often when imap'ing
+    # NoResponseError and ByResponseError happen often when imap'ing
   rescue Net::IMAP::NoResponseError => e
+    puts "Net::IMAP::NoResponseError caught"
     # send to log file, db, or email
   rescue Net::IMAP::ByeResponseError => e
+    puts "Net::IMAP::ByeResponseError caught"
     # send to log file, db, or email
   rescue => e
+    puts "Some other exception caught #{e}"
+    raise
     # send to log file, db, or email
   end
 
