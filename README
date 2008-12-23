@@ -1,0 +1,5 @@
+This is the start of a clone of the iwantsandy service for use in a local environment.  I relied on iwantsandy so much that I decided to implement the functionality that I use on my own.
+
+There are some enhancements too, such as a more terse e-mail reminder system for iPhone and mobile use, as well as a really slick iPhone/iPod Touch web interface.
+
+The primary use is for e-mail reminders.  The remembering part was really of no use for me, but if someone wishes to implement this with a good argument for having it, be my guest.
