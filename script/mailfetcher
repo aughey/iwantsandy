@@ -15,9 +15,12 @@ config = YAML.load(File.read(File.join(RAILS_ROOT, 'config', 'mail.yml')))
 loop do
   begin
     # make a connection to imap account
+    puts "Connecting to imap #{config['host']}"
     imap = Net::IMAP.new(config['host'], config['port'], true)
+    puts "Logging in with #{config['username']} #{config['password']}"
     imap.login(config['username'], config['password'])
     # select inbox as our mailbox to process
+    puts "Selecting inbox"
     imap.select('Inbox')
 
     # get all emails that are in inbox that have not been deleted
