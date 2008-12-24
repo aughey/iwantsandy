@@ -9,12 +9,31 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20081223222522) do
+ActiveRecord::Schema.define(:version => 20081224011943) do
+
+  create_table "parse_problems", :force => true do |t|
+    t.string   "message"
+    t.integer  "raw_email_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "parse_problems", ["raw_email_id"], :name => "index_parse_problems_on_raw_email_id"
 
   create_table "raw_emails", :force => true do |t|
     t.text     "rfc822"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  create_table "reminders", :force => true do |t|
+    t.datetime "time"
+    t.string   "message"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "raw_email_id"
+  end
+
+  add_index "reminders", ["raw_email_id"], :name => "index_reminders_on_raw_email_id"
 
 end
