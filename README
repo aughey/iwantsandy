@@ -6,3 +6,23 @@ The primary use is for e-mail reminders.  The remembering part was really of no 
 
 Dependencies:
 tmail, rails, net/imap (with ssl for gmail), haml, Chronic
+
+Plan:
+
+I'm working on the system in several stages based on need.
+
+E-Mail interface (you are here)
+  The email interface is my primary interface to the system.  Except
+  doing the initial account setup, I did all my interfacing with Sandy
+  through e-mail.  Half of the time it is e-mails forwarded to Sandy
+  with a heading "r tomorrow" and the other half of the time it is one
+  line e-mails saying something like "r friday take back library books".
+
+Basic Web Interface
+  All of the information is stored in the database, and presenting it
+  with show actions is quite easy.
+
+Comprehensive Web Interface
+  What goes here?  If the primary interface is e-mail, I don't really
+  want to make a whole calendar system.  That has already been done 
+  better before.
