@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20081224011943) do
+ActiveRecord::Schema.define(:version => 20081224025532) do
 
   create_table "parse_problems", :force => true do |t|
     t.string   "message"
@@ -35,5 +35,13 @@ ActiveRecord::Schema.define(:version => 20081224011943) do
   end
 
   add_index "reminders", ["raw_email_id"], :name => "index_reminders_on_raw_email_id"
+
+  create_table "sent_emails", :force => true do |t|
+    t.integer  "parent_id"
+    t.string   "parent_type"
+    t.text     "rfc822"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
 end
