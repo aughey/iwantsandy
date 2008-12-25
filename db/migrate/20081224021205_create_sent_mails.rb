@@ -1,6 +1,6 @@
 class CreateSentMails < ActiveRecord::Migration
   def self.up
-    create_table :sent_mails do |t|
+    create_table :sent_emails do |t|
       t.integer :parent_id
       t.string :parent_type
       t.text :rfc882

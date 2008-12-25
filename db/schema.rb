@@ -11,6 +11,21 @@
 
 ActiveRecord::Schema.define(:version => 20081224025532) do
 
+  create_table "open_id_authentication_associations", :force => true do |t|
+    t.integer "issued"
+    t.integer "lifetime"
+    t.string  "handle"
+    t.string  "assoc_type"
+    t.binary  "server_url"
+    t.binary  "secret"
+  end
+
+  create_table "open_id_authentication_nonces", :force => true do |t|
+    t.integer "timestamp",  :null => false
+    t.string  "server_url"
+    t.string  "salt",       :null => false
+  end
+
   create_table "parse_problems", :force => true do |t|
     t.string   "message"
     t.integer  "raw_email_id"
@@ -19,6 +34,14 @@ ActiveRecord::Schema.define(:version => 20081224025532) do
   end
 
   add_index "parse_problems", ["raw_email_id"], :name => "index_parse_problems_on_raw_email_id"
+
+  create_table "passwords", :force => true do |t|
+    t.integer  "user_id"
+    t.string   "reset_code"
+    t.datetime "expiration_date"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "raw_emails", :force => true do |t|
     t.text     "rfc822"
@@ -36,6 +59,15 @@ ActiveRecord::Schema.define(:version => 20081224025532) do
 
   add_index "reminders", ["raw_email_id"], :name => "index_reminders_on_raw_email_id"
 
+  create_table "roles", :force => true do |t|
+    t.string "name"
+  end
+
+  create_table "roles_users", :id => false, :force => true do |t|
+    t.integer "role_id"
+    t.integer "user_id"
+  end
+
   create_table "sent_emails", :force => true do |t|
     t.integer  "parent_id"
     t.string   "parent_type"
@@ -43,5 +75,34 @@ ActiveRecord::Schema.define(:version => 20081224025532) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  create_table "sessions", :force => true do |t|
+    t.string   "session_id", :null => false
+    t.text     "data"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "sessions", ["session_id"], :name => "index_sessions_on_session_id"
+  add_index "sessions", ["updated_at"], :name => "index_sessions_on_updated_at"
+
+  create_table "users", :force => true do |t|
+    t.string   "login",                     :limit => 40
+    t.string   "identity_url"
+    t.string   "name",                      :limit => 100, :default => ""
+    t.string   "email",                     :limit => 100
+    t.string   "crypted_password",          :limit => 40
+    t.string   "salt",                      :limit => 40
+    t.string   "remember_token",            :limit => 40
+    t.string   "activation_code",           :limit => 40
+    t.string   "state",                                    :default => "passive", :null => false
+    t.datetime "remember_token_expires_at"
+    t.datetime "activated_at"
+    t.datetime "deleted_at"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "users", ["login"], :name => "index_users_on_login", :unique => true
 
 end
